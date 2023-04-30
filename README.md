@@ -9,4 +9,4 @@ A Grand Theft Auto fuel mod made for the Stand mod menu
 ---
 # Credits
 
-Thanks to [FuelMod](https://github.com/GoldenLys/FuelMod) for the idea and base code!
+Thanks to [FuelMod](https://github.com/GoldenLys/FuelMod) for the idea and some code!
