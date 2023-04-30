@@ -1,7 +1,7 @@
 util.require_natives(1681379138)
 
 local SCRIPT = "Fuel mod"
-VERSION = "0.1"
+local VERSION = "0.1"
 local RESOURCES_DIR = filesystem.resources_dir() .. "user0092_fuel_mod"
 
 local notify = function (message)
@@ -259,18 +259,18 @@ local last_blip = nil
 local SETTINGS_FILE = RESOURCES_DIR .. "\\settings.txt"
 
 -- functions
-local split = function (inputstr, sep)
+local function split(inputstr, sep)
     if sep == nil then
             sep = "%s"
     end
-    local t={}
+    local t = {}
     for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-            table.insert(t, str)
+        table.insert(t, str)
     end
     return t
 end
 
-local convert_to_type = function (str)
+local function convert_to_type(str)
     if (string.lower(str) == "true" or str == true) then
         return true
     end
@@ -284,8 +284,7 @@ local convert_to_type = function (str)
     return str
 end
 
-local save_settings = function()
-    log(SETTINGS_FILE)
+local function save_settings()
     if (not filesystem.exists(SETTINGS_FILE)) then
         util.register_file(SETTINGS_FILE)
     end
@@ -300,7 +299,7 @@ local save_settings = function()
     file:close()
 end
 
-local load_settings = function ()
+local function load_settings()
     if (not filesystem.exists(SETTINGS_FILE)) then
         return
     end
@@ -322,7 +321,7 @@ local load_settings = function ()
     end
 end
 
-local gallons_to_liters = function (gallons)
+local function gallons_to_liters(gallons)
     if (gallons == 0) then
         return 0
     end
@@ -330,7 +329,7 @@ local gallons_to_liters = function (gallons)
     return gallons * 3.785412
 end
 
-local liters_to_gallons = function(liters)
+local function liters_to_gallons(liters)
     if (liters == 0) then
         return 0
     end
@@ -338,12 +337,12 @@ local liters_to_gallons = function(liters)
     return liters / 3.785412
 end
 
-local round = function (num, dp)
+local function round(num, dp)
     local mult = 10^(dp or 0)
     return math.floor(num * mult + 0.5)/mult
 end
 
-local get_user_vehicle_as_pointer = function()
+local function get_user_vehicle_as_pointer()
     local e = entities.get_user_vehicle_as_pointer(false)
     if e == 0 or not e then
         return nil
@@ -351,7 +350,7 @@ local get_user_vehicle_as_pointer = function()
     return e
 end
 
-local get_user_vehicle_as_handle = function()
+local function get_user_vehicle_as_handle()
     local e = entities.get_user_vehicle_as_handle(false)
     if e == -1 or not e then
         return nil
@@ -359,11 +358,11 @@ local get_user_vehicle_as_handle = function()
     return e
 end
 
-local get_player_ped = function () 
+local function get_player_ped () 
     return players.user_ped()
 end
 
-local is_driving = function ()
+local function is_driving()
     if get_user_vehicle_as_pointer() ~= nil then
         if VEHICLE.IS_VEHICLE_STOPPED(get_user_vehicle_as_handle()) then 
             return false
@@ -375,22 +374,22 @@ local is_driving = function ()
     return false
 end
 
-local get_vehicle_model_id = function ()
+local function get_vehicle_model_id()
     return players.get_vehicle_model(players.user())
 end
 
-local get_distance_between_coords = function (first, second)
+local function get_distance_between_coords(first, second)
     local x = second.x - first.x
     local y = second.y - first.y
     local z = second.z - first.z
     return math.sqrt(x * x + y * y + z * z)
 end
 
-local get_vehicle_display_name = function ()
+local function get_vehicle_display_name()
     return VEHICLE.GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(players.get_vehicle_model(players.user()))
 end
 
-local is_electric = function()
+local function is_electric()
     local evList = {"VOLTIC2", "VOLTIC", "CYCLONE2", "CYCLONE", "TEZERACT", "IWAGEN", "NEON", "RAIDEN", "AIRTUG", "CADDY3", "CADDY2", "CADDY", "IMORGON", "KHAMEL", "DILETTANTE", "SURGE", "OMNISEGT"}
     for k,v in pairs(evList) do
         if string.lower(get_vehicle_display_name()) == string.lower(v) then
@@ -400,11 +399,11 @@ local is_electric = function()
     return false
 end
 
-local get_vehicle_speed = function()
+local function get_vehicle_speed()
     return ENTITY.GET_ENTITY_SPEED(get_user_vehicle_as_handle())
 end
 
-local get_vehicle_model_value = function()
+local function get_vehicle_speed()
     return VEHICLE.GET_VEHICLE_CLASS_FROM_NAME(players.get_vehicle_model(players.user()))
 end
 
@@ -412,7 +411,7 @@ local function is_empty(search)
     return search == nil or search == ''
 end
 
-local CAN_REFUEL_CHECK = function ()
+local function can_refuel()
     for index, coords in pairs(GAS_PUMP_COORDS) do
         local pos = players.get_position(players.user())
         if get_distance_between_coords(pos, coords) <= settings.station_range then
@@ -422,7 +421,7 @@ local CAN_REFUEL_CHECK = function ()
     return false
 end
 
-local function UPDATE_VEHICLE_DB()
+local function update_vehicles()
     if is_empty(used_vehicles[get_user_vehicle_as_handle()]) then
         used_vehicles[get_user_vehicle_as_handle()] = settings.base_fuel_level / 100 * class_fuel_capacity[get_vehicle_model_value()][2]
         current.fuel_level = settings.base_fuel_level / 100 * class_fuel_capacity[get_vehicle_model_value()][2]
@@ -431,7 +430,7 @@ local function UPDATE_VEHICLE_DB()
     end
 end
 
-local decrease_fuel_level = function ()
+local function decrease_fuel_level()
     if (current.fuel_level > 0 and get_vehicle_speed() > 4) then
         if is_electric() then
             current.fuel_level = used_vehicles[get_user_vehicle_as_handle()] - fuel_usage[round(entities.get_rpm(get_user_vehicle_as_handle()), 1)] * (class_fuel_capacity.electrics[1]) * (settings.consumption_rate / 10)
@@ -447,7 +446,7 @@ local decrease_fuel_level = function ()
     end
 end
 
-local find_best_station = function()
+local function find_best_station()
     local lowest = {distance = nil, coords = nil}
     local pos = players.get_position(players.user())
     for index, coords in pairs(GAS_STATION_COORDS) do
@@ -465,7 +464,7 @@ local find_best_station = function()
     return lowest
 end
 
-local create_blips = function ()
+local function create_blips()
     while (util.is_session_started() ~= true) do
         util.yield(10)
     end
@@ -480,8 +479,8 @@ local create_blips = function ()
     end
 end
 
-local increase_fuel_level = function ()
-    if (CAN_REFUEL_CHECK()) then
+local function increase_fuel_level()
+    if (can_refuel()) then
         if current.fuel_level < current.tank_size and get_vehicle_speed() < 1 then
             current.fuel_level = used_vehicles[get_user_vehicle_as_handle()] + (settings.refuel / 10)
             used_vehicles[get_user_vehicle_as_handle()] = current.fuel_level
@@ -492,7 +491,7 @@ local increase_fuel_level = function ()
     end
 end
 
-local MANUAL_REFUELLING = function ()
+local function manual_refuelling()
     if (is_driving() == false) then
         local pos = players.get_position(players.user())
         if (current.latest_coords == nil) then
@@ -510,7 +509,7 @@ local MANUAL_REFUELLING = function ()
     end
 end
 
-local main_backend = function ()
+local function main_backend()
     while (run_fuel_mod) do
         if (is_driving()) then
             if (is_electric()) then
@@ -518,7 +517,7 @@ local main_backend = function ()
             else
                 current.tank_size = class_fuel_capacity[get_vehicle_model_value()][2]
             end
-            UPDATE_VEHICLE_DB()
+            update_vehicles()
             decrease_fuel_level()
             current.latest_hash = get_user_vehicle_as_handle()
             current.latest_coords = players.get_position(players.user())
@@ -559,15 +558,30 @@ local main_backend = function ()
     fuel_thread = false
 end
 
+local function check_version()
+    async_http.init('raw.githubusercontent.com', '/User00092/Fuel-Mod/main/VERSION', function(body, header_fields, status_code)
+        if (status_code ~= 200) then
+            notify('Failed to check version.')
+        end
+        if (body:gsub("\n", "") ~= VERSION) then
+            notify('A new version is available!')
+        else
+            notify('You have the latest version!')
+        end
+    end, function()
+        notify('Failed to check version.')
+    end)
+    async_http.dispatch()
+end
 
-local main_refuel_backend = function ()
+local function main_refuel_backend()
     while (run_fuel_mod) do
         if (is_driving() == false and get_user_vehicle_as_pointer() ~= nil) then
-            UPDATE_VEHICLE_DB()
+            update_vehicles()
             increase_fuel_level()
         else
             if not is_empty(current.latest_hash) then
-                MANUAL_REFUELLING()
+                manual_refuelling()
             end
         end
         ::continue::
@@ -576,7 +590,7 @@ local main_refuel_backend = function ()
     refuel_thread = false
 end
 
-local main_hub_backend = function ()
+local function main_hub_backend()
     while (run_fuel_mod) do
         if (last_blip ~= nil) then
             if (not HUD.DOES_BLIP_EXIST(last_blip)) then
@@ -590,7 +604,7 @@ local main_hub_backend = function ()
     hub_thread = false
 end
 
-local main_features_thread = function()
+local function main_features_thread()
     local bad = false
     while (run_fuel_mod) do
         if (get_user_vehicle_as_pointer() ~= nil) then
@@ -826,3 +840,4 @@ end)
 
 load_settings()
 update_settings()
+check_version()
