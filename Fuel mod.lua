@@ -1,7 +1,7 @@
 util.require_natives(1681379138)
 
 local SCRIPT = "Fuel mod"
-VERSION = "0.0.1"
+VERSION = "0.1"
 local RESOURCES_DIR = filesystem.resources_dir() .. "user0092_fuel_mod"
 
 local notify = function (message)
