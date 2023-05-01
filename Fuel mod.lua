@@ -1,7 +1,7 @@
 util.require_natives(1681379138)
 
 local SCRIPT = "Fuel mod"
-local VERSION = "0.1"
+local VERSION = "0.2"
 local RESOURCES_DIR = filesystem.resources_dir() .. "user0092_fuel_mod"
 
 local notify = function (message)
@@ -256,6 +256,7 @@ local current = {
 local created_blips = {}
 local used_vehicles = {}
 local last_blip = nil
+local increase_fuel_level_notified = false
 local SETTINGS_FILE = RESOURCES_DIR .. "\\settings.txt"
 
 -- functions
@@ -403,7 +404,7 @@ local function get_vehicle_speed()
     return ENTITY.GET_ENTITY_SPEED(get_user_vehicle_as_handle())
 end
 
-local function get_vehicle_speed()
+local function get_vehicle_model_value()
     return VEHICLE.GET_VEHICLE_CLASS_FROM_NAME(players.get_vehicle_model(players.user()))
 end
 
@@ -481,6 +482,9 @@ end
 
 local function increase_fuel_level()
     if (can_refuel()) then
+        if (VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(get_user_vehicle_as_handle())) then
+            return
+        end
         if current.fuel_level < current.tank_size and get_vehicle_speed() < 1 then
             current.fuel_level = used_vehicles[get_user_vehicle_as_handle()] + (settings.refuel / 10)
             used_vehicles[get_user_vehicle_as_handle()] = current.fuel_level
@@ -609,13 +613,26 @@ local function main_features_thread()
     while (run_fuel_mod) do
         if (get_user_vehicle_as_pointer() ~= nil) then
             local handle = get_user_vehicle_as_handle()
-            if (class_fuel_capacity[get_vehicle_model_value()][2] == 0) then
+            if (class_fuel_capacity[get_vehicle_model_value()][2] == 0 or current.latest_hash == nil) then
                 goto continue
-            end 
-            if (current.fuel_level < 5) then
+            end
+            local percentage = round(used_vehicles[current.latest_hash] * 100 / current.tank_size, 0)
+            if (can_refuel()) then
+                if (VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(handle) and get_vehicle_speed() < 1 and percentage < 99) then
+                    if (increase_fuel_level_notified == false) then
+                        notify('Please turn off your vehicle to begin fueling.')
+                    end
+                    increase_fuel_level_notified = true
+                else
+                    increase_fuel_level_notified = false
+                end
+            else
+                increase_fuel_level_notified = false
+            end
+
+            if (percentage < 5) then
                 if (bad == false) then
                     bad = true
-                    -- TODO: change 0.1 back to 0.7
                     VEHICLE.SET_VEHICLE_CAN_ENGINE_MISSFIRE(handle, true)
                     VEHICLE.MODIFY_VEHICLE_TOP_SPEED(handle, VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(handle) * 0.7)
                 end
@@ -636,6 +653,7 @@ local function main_features_thread()
         util.yield(10)
     end
     features_thread = false
+    increase_fuel_level_notified = false
 end
 
 -- MAIN
@@ -666,9 +684,22 @@ MAIN_FUEL_MOD_PATH:action('Mark Nearest Station', {}, "", function ()
     HUD.SET_NEW_WAYPOINT(lowest.coords.x, lowest.coords.y)
 end)
 
-MAIN_FUEL_MOD_PATH:action('Copy coords', {}, "", function()
-    local pos = players.get_position(players.user())
-    util.copy_to_clipboard("{x=" .. pos.x .. ", y=" .. pos.y .. ", z=" .. pos.z .. "},")
+-- MAIN_FUEL_MOD_PATH:action('Copy coords', {}, "", function()
+--     local pos = players.get_position(players.user())
+--     util.copy_to_clipboard("{x=" .. pos.x .. ", y=" .. pos.y .. ", z=" .. pos.z .. "},")
+-- end)
+
+MAIN_FUEL_MOD_PATH:action('Toggle Engine', {}, "", function()
+    local handle = get_user_vehicle_as_handle()
+    if (handle == nil) then
+        return
+    end
+
+    if (VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(handle)) then
+        VEHICLE.SET_VEHICLE_ENGINE_ON(handle, false, false, true)
+    else
+        VEHICLE.SET_VEHICLE_ENGINE_ON(handle, true, false, false)
+    end
 end)
 
 -- SETTINGS
@@ -781,6 +812,9 @@ MAIN_CREDITS_PATH:readonly(MENU_LABELS.CREDITS_CREATED_BY)
 MAIN_CREDITS_PATH:hyperlink(MENU_LABELS.CREDITS_MY_GITHUB, "https://github.com/User00092")
 
 util.create_tick_handler(function()
+    if (run_fuel_mod == false) then
+        goto continue
+    end
     if (current.latest_coords == nil or current.latest_hash == nil) then
         return
     end
@@ -834,8 +868,8 @@ util.create_tick_handler(function()
                 true                             -- force in bounds
             )
         end
-        
     end
+    ::continue::
 end)
 
 load_settings()
