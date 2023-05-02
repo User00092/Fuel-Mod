@@ -8,3 +8,6 @@ The mod developed by [User0092](https://github.com/User00092) for the Stand mod 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+---
+## Credits
