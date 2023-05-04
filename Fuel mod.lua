@@ -1,7 +1,7 @@
 util.require_natives(1681379138)
 
 local SCRIPT = "Fuel mod"
-local VERSION = "0.2"
+local VERSION = "0.2.1"
 local RESOURCES_DIR = filesystem.resources_dir() .. "user0092_fuel_mod"
 
 local notify = function (message)
@@ -261,14 +261,7 @@ local SETTINGS_FILE = RESOURCES_DIR .. "\\settings.txt"
 
 -- functions
 local function split(inputstr, sep)
-    if sep == nil then
-            sep = "%s"
-    end
-    local t = {}
-    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-        table.insert(t, str)
-    end
-    return t
+    return string.split(inputstr, sep)
 end
 
 local function convert_to_type(str)
@@ -292,7 +285,7 @@ local function save_settings()
 
     local str = ""
     local file = io.open(SETTINGS_FILE, "w")
-    for k, v in pairs(settings) do
+    for k, v in settings do
         str = str .. k .. "=" .. v .. "\n"
     end
 
@@ -308,7 +301,7 @@ local function load_settings()
     local file = io.open(SETTINGS_FILE, "r")
     local str = file:read("*all")
     local first_split = split(str, "\n")
-    for k, v in pairs(first_split) do
+    for first_split as v do
         if (not v) then
             goto continue
         end
@@ -323,18 +316,10 @@ local function load_settings()
 end
 
 local function gallons_to_liters(gallons)
-    if (gallons == 0) then
-        return 0
-    end
-
     return gallons * 3.785412
 end
 
 local function liters_to_gallons(liters)
-    if (liters == 0) then
-        return 0
-    end
-
     return liters / 3.785412
 end
 
@@ -359,7 +344,7 @@ local function get_user_vehicle_as_handle()
     return e
 end
 
-local function get_player_ped () 
+local function get_player_ped() 
     return players.user_ped()
 end
 
@@ -392,7 +377,7 @@ end
 
 local function is_electric()
     local evList = {"VOLTIC2", "VOLTIC", "CYCLONE2", "CYCLONE", "TEZERACT", "IWAGEN", "NEON", "RAIDEN", "AIRTUG", "CADDY3", "CADDY2", "CADDY", "IMORGON", "KHAMEL", "DILETTANTE", "SURGE", "OMNISEGT"}
-    for k,v in pairs(evList) do
+    for evList as v do
         if string.lower(get_vehicle_display_name()) == string.lower(v) then
             return true
         end
@@ -413,7 +398,7 @@ local function is_empty(search)
 end
 
 local function can_refuel()
-    for index, coords in pairs(GAS_PUMP_COORDS) do
+    for GAS_PUMP_COORDS as coords do
         local pos = players.get_position(players.user())
         if get_distance_between_coords(pos, coords) <= settings.station_range then
             return true
@@ -450,7 +435,7 @@ end
 local function find_best_station()
     local lowest = {distance = nil, coords = nil}
     local pos = players.get_position(players.user())
-    for index, coords in pairs(GAS_STATION_COORDS) do
+    for GAS_STATION_COORDS as coords do
         local dist = get_distance_between_coords(pos, coords)
         if (lowest.distance == nil) then
             lowest.distance = dist
@@ -470,7 +455,7 @@ local function create_blips()
         util.yield(10)
     end
 
-    for index, coords in pairs(GAS_STATION_COORDS) do
+    for GAS_STATION_COORDS as coords do
         local blip = HUD.ADD_BLIP_FOR_COORD(coords.x, coords.y, coords.z)
         HUD.SET_BLIP_SPRITE(blip, 361)
         HUD.SET_BLIP_COLOUR(blip, 75)
@@ -501,7 +486,7 @@ local function manual_refuelling()
         if (current.latest_coords == nil) then
             goto continue
         end
-        if (used_vehicles[current.latest_hash] < current.tank_size and WEAPON.GET_SELECTED_PED_WEAPON(players.user_ped()) == 883325847 and
+        if (used_vehicles[current.latest_hash] < current.tank_size and WEAPON.GET_SELECTED_PED_WEAPON(players.user_ped()) == util.joaat("weapon_petrolcan") and
             get_distance_between_coords(current.latest_coords, pos) <= settings.station_range) then
             used_vehicles[current.latest_hash] = used_vehicles[current.latest_hash] + (settings.manual_refuel / 10)
             if (used_vehicles[current.latest_hash] > current.tank_size) then
@@ -679,7 +664,7 @@ local MAIN_ENABLE_FUEL_MOD = MAIN_FUEL_MOD_PATH:toggle(MENU_LABELS.ENABLE_FUEL_M
     end
 end)
 
-MAIN_FUEL_MOD_PATH:action('Mark Nearest Station', {}, "", function ()
+MAIN_FUEL_MOD_PATH:action('Mark Nearest Station', {}, "", function()
     local lowest = find_best_station()
     HUD.SET_NEW_WAYPOINT(lowest.coords.x, lowest.coords.y)
 end)
@@ -771,11 +756,11 @@ local SETTINGS_ENABLE_ON_LOAD = MAIN_SETTINGS_PATH:toggle('Enable on Load', {}, 
     settings.enable_mod_on_load = status
 end)
 
-MAIN_SETTINGS_PATH:action('Save Settings', {}, "", function ()
+MAIN_SETTINGS_PATH:action('Save Settings', {}, "", function()
     save_settings()
 end)
 
-local update_settings = function ()
+local update_settings = function()
     menu.set_value(SETTINGS_X_POS, settings.x_display)
     menu.set_value(SETTINGS_Y_POS, settings.y_display)
     menu.set_value(SETTINGS_IMAGE_SCALE, settings.picture_scale)
@@ -801,7 +786,7 @@ local update_settings = function ()
     menu.set_max_value(SETTINGS_Y_POS, settings.screen_height)
 end
 
-MAIN_SETTINGS_PATH:action('Load Settings', {}, "", function ()
+MAIN_SETTINGS_PATH:action('Load Settings', {}, "", function()
     load_settings()
     update_settings()
 end)
