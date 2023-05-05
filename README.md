@@ -11,3 +11,4 @@ The mod developed by [User0092](https://github.com/User00092) for the Stand mod 
 
 ---
 ## Credits
+[2Take1 equivalent](https://github.com/GoldenLys/FuelMod) - Thank you for the idea, and I took some functions.
