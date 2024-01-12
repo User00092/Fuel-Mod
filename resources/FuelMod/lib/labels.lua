@@ -1,0 +1,31 @@
+local labels = {}
+
+labels.SETTINGS_ENABLE_SCRIPT = "Enable script"
+labels.SETTINGS_ENABLE_SCRIPT_ON_LOAD = "Enable on load"
+labels.SETTINGS_REFUEL_VEHICLE = "Refuel vehicles"
+labels.SETTINGS_VEHICLE_MANAGER = "Vehicle manager"
+labels.SETTINGS_SETTINGS_LABEL = "Settings"
+labels.SETTINGS_SAVE_SETTINGS_LABEL = "Save settings"
+labels.SETTINGS_LOAD_SETTINGS_LABEL = "Load settings"
+labels.SETTINGS_ENABLE_BLIPS = "Enable blips"
+labels.SETTINGS_BLIP_SCALE = "Blip scale"
+labels.SETTINGS_BASE_FUEL_LEVEL = "Base fuel level"
+labels.SETTINGS_STATION_RANGE = "Station range"
+labels.SETTINGS_CONSUMPTION_RATE = "Consumption rate"
+labels.SETTINGS_REFUEL_RATE = "Refuel Rate"
+labels.SETTINGS_MANUAL_REFUEL_RATE = "Manual Refuel Rate"
+labels.SETTINGS_ENABLE_PERCENTAGE_TEXT = "Enable gas percentage text"
+labels.SETTINGS_GAS_PERCENTAGE_TEXT_COLOR = "Gas percent text color"
+labels.SETTINGS_SHOW_GAS_PERCENTAGE_TEXT_POS = "Gas percent position and scale"
+labels.SETTINGS_SHOW_GAS_PERCENTAGE_TEXT_POS_X = "X"
+labels.SETTINGS_SHOW_GAS_PERCENTAGE_TEXT_POS_Y = "Y"
+labels.SETTINGS_SHOW_GAS_PERCENTAGE_TEXT_SCALE = "Scale"
+
+labels.VEHICLE_MANAGER_FUEL = "Fuel"
+labels.VEHICLE_MANAGER_HANDLE = "Handle"
+labels.VEHICLE_MANAGER_REFUEL = "Refuel"
+labels.VEHICLE_MANAGER_REMOVE = "Remove"
+labels.VEHICLE_MANAGER_ENGINE_STATE = "Engine state"
+labels.VEHICLE_MANAGER_TOGGLE_ENGINE = "Toggle engine"
+
+return labels
