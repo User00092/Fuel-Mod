@@ -1,26 +1,6 @@
 
 local utils = {}
 utils.used_vehicles = {}
-utils.log_file = nil
-
-utils.getCurrentDateTime = function()
-    return os.date("%Y-%m-%d %H:%M:%S")
-end
-
-function debug(text)
-    local timestamp = utils.getCurrentDateTime()
-    if config_handler:get("debug_to_file", false) then
-        if not utils.log_file then
-            utils.log_file = io.open(stand_log_path .. "log_" .. timestamp .. ".log", "w")
-        end
-        utils.log_file:write("[" .. timestamp .. "]" .. text .. "\n")
-        util.log("[Fuel Mod Logs][" .. timestamp .. "]" .. text .. "\n")
-    end
-
-    if config_handler:get("debug_to_console", false) then
-        print("[Fuel Mod Logs][" .. timestamp .. "]" .. text)
-    end
-end
 
 utils.create_file = function(filename, data)
     local file = io.open(filename, "r")
