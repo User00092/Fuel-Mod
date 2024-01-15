@@ -51,7 +51,7 @@ function enable_script()
                 end
 
                 for v_handle, v_data in utilities.used_vehicles do
-                    if not utilities.does_vehicle_exist(v_handle) then
+                    if not utilities.does_vehicle_exist(v_handle) or utilities.is_empty(utilities.used_vehicles[v_handle]) then
                         utilities.used_vehicles[v_handle] = nil
                     else
                         utilities.decrease_vehicle_fuel_level(v_handle, v_data.v_model)
@@ -117,15 +117,11 @@ function enable_script()
                 util.yield(100)
             end
             for v_handle, v_data in utilities.used_vehicles do
-                if not utilities.does_vehicle_exist(v_handle) then
-                    goto continue
-                end
                 if utilities.can_refuel(v_data.latest_coords) then
                     utilities.increase_fuel_level(v_handle)
                 else
                     utilities.manual_refuel(v_handle)
                 end
-                ::continue::
             end
             util.yield(150)
         end
