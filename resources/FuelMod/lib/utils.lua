@@ -222,11 +222,17 @@ utils.update_vehicle = function(v_handle)
     if utils.is_empty(utils.used_vehicles[vh]) then
         local vm = utils.get_vehicle_model_value()
         local tank_capacity
+
         local v_is_electric = utils.is_electric()
         if v_is_electric then
             tank_capacity = fuel.class_fuel_capacity.electrics[2]
         else
             tank_capacity = utils.get_vehicle_fuel_capacity(vm)
+        end
+
+        if not tank_capacity or tank_capacity == 0 then
+            utils.update_vehicle_options()
+            return
         end
 
         utils.used_vehicles[vh] = {
@@ -296,8 +302,10 @@ utils.color_to_stand = function (value)
 end
 
 utils.refuel_all_vehicles = function ()
-    for v_handle, _ in utilities.used_vehicles do
-        utils.used_vehicles[v_handle].fuel_level = utils.used_vehicles[v_handle].tank_size
+    for v_handle, _ in utils.used_vehicles do
+        if utils.does_vehicle_exist(v_handle) then
+            utils.used_vehicles[v_handle].fuel_level = utils.used_vehicles[v_handle].tank_size
+        end
     end
 end
 
