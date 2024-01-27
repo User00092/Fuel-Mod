@@ -12,6 +12,7 @@ settings.load_default = function ()
 
     menu.set_value(settings.stand.enable_on_load_button, config_handler:get("enable_on_load", false))
     menu.set_value(settings.stand.enable_blips_button, config_handler:get("enable_blips", false))
+    menu.set_value(settings.stand.enable_short_range_blips, config_handler:get("short_range_blips", true))
     menu.set_value(settings.stand.set_blip_scale_button, utilities.float_to_stand(config_handler:get("blip_scale", 0.8)))
     menu.set_value(settings.stand.set_consumption_rate, utilities.float_to_stand(config_handler:get("consumption_rate", 0.8)))
     menu.set_value(settings.stand.set_base_fuel_level_button, config_handler:get("base_fuel_level", 40))
@@ -81,6 +82,15 @@ end)
 
 settings.stand.enable_blips_button = menu.toggle(settings.stand.settings_root, labels.SETTINGS_ENABLE_BLIPS, {}, "", function (state)
     config_handler.data["enable_blips"] = state
+    if not state then
+        utilities.remove_blips()
+    else
+        utilities.create_blips()
+    end
+end)
+
+settings.stand.enable_short_range_blips = menu.toggle(settings.stand.settings_root, labels.SETTINGS_ENABLE_SHORT_RANGE_BLIPS, {}, "", function (state)
+    config_handler.data["short_range_blips"] = state
     if not state then
         utilities.remove_blips()
     else
